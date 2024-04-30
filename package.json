@@ -1,11 +1,11 @@
 {
-  "name": "chrome-extension-template-preact-vite",
+  "name": "littlesis-browser",
   "version": "0.0.1",
-  "description": "Chrome extension template with Preact, Tailwind CSS, Vite and Typescript preconfigured.",
+  "description": "Browser tools for LittleSis editors",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fell-lucas/chrome-extension-template-preact-vite.git"
+    "url": "https://github.com/lovemedicine/littlesis-browser.git"
   },
   "scripts": {
     "build": "vite build",
@@ -87,5 +87,8 @@
         }
       ]
     }
+  },
+  "dependencies": {
+    "daisyui": "^4.10.2"
   }
 }

@@ -210,6 +210,11 @@ export interface ManifestType {
         content_security_policy?: string | undefined;
       }
     | undefined;
+  side_panel?:
+    | {
+        default_path?: string | undefined;
+      }
+    | undefined;
   short_name?: string | undefined;
   spellcheck?:
     | {
