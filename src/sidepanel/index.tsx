@@ -1,4 +1,4 @@
-import Sidepanel from '@src/sidepanel/Sidepanel';
+import Sidepanel from './components/Sidepanel';
 import { initElement } from '@src/main';
 
 initElement(<Sidepanel />);
