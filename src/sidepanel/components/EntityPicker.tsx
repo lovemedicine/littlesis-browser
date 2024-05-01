@@ -1,3 +1,4 @@
+import { useState } from 'preact/hooks';
 import SelectedEntity from './SelectedEntity';
 import EntitySearchForm from './EntitySearchForm';
 import { Entity } from '@src/types';

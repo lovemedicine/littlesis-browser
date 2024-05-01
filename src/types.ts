@@ -1,5 +1,5 @@
 export type LsEntity = {
-  id: string;
+  id: number;
   name: string;
   primary_ext: string;
   url: string;
@@ -8,7 +8,7 @@ export type LsEntity = {
 };
 
 export type Entity = {
-  id: string;
+  id: number;
   name: string;
   type: string;
   url: string;

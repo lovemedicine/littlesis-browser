@@ -1,3 +1,7 @@
+import { createContext } from 'preact';
+
+export const TokenContext = createContext<string | null>(null);
+
 export function openNewTab(url: string) {
   chrome.tabs.query({ currentWindow: true }, tabs => {
     console.log(
@@ -12,4 +16,11 @@ export function openNewTab(url: string) {
       chrome.tabs.create({ url });
     }
   });
+}
+
+export function capitalize(str: string): string {
+  return str
+    .split(/\s+/g)
+    .map(word => word[0].toUpperCase() + word.slice(1))
+    .join(' ');
 }

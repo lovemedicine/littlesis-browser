@@ -47,12 +47,6 @@ export default function RelationshipPicker({
     );
   }, [type1, type2]);
 
-  console.log(
-    type1,
-    type2,
-    allowedCategories.map(cat => cat[0])
-  );
-
   return (
     <select
       className='select select-bordered select-sm mt-2 w-full max-w-xs'
