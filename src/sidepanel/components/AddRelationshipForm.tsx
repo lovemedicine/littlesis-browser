@@ -1,9 +1,11 @@
 import { useState, useEffect, useContext } from 'preact/hooks';
 import EntityPicker from './EntityPicker';
 import RelationshipPicker from './RelationshipPicker';
+import TextInput from './TextInput';
 import { TokenContext, getPageInfo } from '@src/util';
 import { createRelationship } from '@src/api';
 import { Entity } from '@src/types';
+import RadioInput from './RadioInput';
 
 type ValidationErrors = {
   [key: string]: string;
@@ -49,34 +51,6 @@ export default function AddRelationshipForm() {
     validateData();
   }, [entity1, entity2, categoryId, isCurrent, url, title]);
 
-  function handleDescription1Change(event: any) {
-    setDescription1(event.target.value);
-  }
-
-  function handleDescription2Change(event: any) {
-    setDescription2(event.target.value);
-  }
-
-  function handleIsCurrentChange(event: any) {
-    setIsCurrent(event.target.value);
-  }
-
-  function handleStartDateChange(event: any) {
-    setStartDate(event.target.value);
-  }
-
-  function handleEndDateChange(event: any) {
-    setEndDate(event.target.value);
-  }
-
-  function handleUrlChange(event: any) {
-    setUrl(event.target.value);
-  }
-
-  function handleTitleChange(event: any) {
-    setTitle(event.target.value);
-  }
-
   function validateData() {
     const errors: ValidationErrors = {};
     if (!entity1) errors.entity1 = 'Entity 1 is missing';
@@ -105,14 +79,14 @@ export default function AddRelationshipForm() {
         entity1_id: (entity1 as Entity).id,
         entity2_id: (entity2 as Entity).id,
         category_id: categoryId as number,
-        description1,
-        description2,
+        description1: description1 || null,
+        description2: description2 || null,
         is_current: JSON.parse(isCurrent as string),
-        start_date: startDate,
-        end_date: endDate,
+        start_date: startDate || null,
+        end_date: endDate || null,
       },
       reference: {
-        url,
+        url: url,
         name: title,
       },
     };
@@ -122,20 +96,70 @@ export default function AddRelationshipForm() {
     setSuccessUrl(result.url);
   }
 
+  function handleReset() {
+    setEntity1(null);
+    setEntity2(null);
+    setCategoryId(null);
+    setDescription1('');
+    setDescription2('');
+    setIsCurrent(null);
+    setStartDate('');
+    setEndDate('');
+    setValidationErrors({});
+    setShowValidationErrors(false);
+    setSuccessUrl(null);
+  }
+
+  function swapEntities() {
+    const entity1Copy = entity1;
+    setEntity1(entity2);
+    setEntity2(entity1Copy);
+  }
+
   return (
     <div className='w-full'>
       <div className='p-2'>
         <div className='text-xl'>Create Relationship</div>
-        <EntityPicker
-          placeholder='Entity 1'
-          entity={entity1}
-          setEntity={setEntity1}
-        />
-        <EntityPicker
-          placeholder='Entity 2'
-          entity={entity2}
-          setEntity={setEntity2}
-        />
+        <div className='flex space-x-2'>
+          <div className='flex-1'>
+            <EntityPicker
+              placeholder='entity 1'
+              entity={entity1}
+              setEntity={setEntity1}
+            />
+
+            <EntityPicker
+              placeholder='entity 2'
+              entity={entity2}
+              setEntity={setEntity2}
+            />
+          </div>
+          <div className='my-auto flex-none'>
+            {entity1 && entity2 && (
+              <button
+                className='btn btn-circle'
+                onClick={swapEntities}
+                title='swap entities'
+              >
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  strokeWidth={1.5}
+                  stroke='currentColor'
+                  className='h-6 w-6'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5'
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+
         <RelationshipPicker
           type1={entity1?.type}
           type2={entity2?.type}
@@ -143,87 +167,44 @@ export default function AddRelationshipForm() {
           setCategory={setCategoryId}
         />
 
-        <input
-          type='text'
-          className='input input-sm input-bordered mt-2 w-full'
+        <TextInput
           placeholder='description 1'
           value={description1}
-          onInput={handleDescription1Change}
+          setValue={setDescription1}
         />
-        <input
-          type='text'
-          className='input input-sm input-bordered mt-2 w-full'
+
+        <TextInput
           placeholder='description 2'
           value={description2}
-          onInput={handleDescription2Change}
+          setValue={setDescription2}
         />
 
-        <div className='mt-2'>
-          <input
-            type='radio'
-            name='is_current'
-            id='yes-current'
-            value='true'
-            className='radio radio-xs'
-            onChange={handleIsCurrentChange}
-          />{' '}
-          <label for='yes-current' className='text-sm'>
-            current
-          </label>
-          &nbsp;&nbsp;&nbsp;
-          <input
-            type='radio'
-            name='is_current'
-            id='no-current'
-            value='false'
-            className='radio radio-xs'
-            onChange={handleIsCurrentChange}
-          />{' '}
-          <label for='no-current' className='text-sm'>
-            past
-          </label>
-          &nbsp;&nbsp;&nbsp;
-          <input
-            type='radio'
-            name='is_current'
-            id='unknown-current'
-            value='null'
-            className='radio radio-xs'
-            onChange={handleIsCurrentChange}
-          />{' '}
-          <label for='unknown-current' className='text-sm'>
-            unknown
-          </label>
-        </div>
+        <RadioInput
+          name='is_current'
+          value={isCurrent}
+          options={['true', 'false', 'null']}
+          labels={['present', 'past', 'unknown']}
+          setValue={setIsCurrent}
+        />
 
-        <input
-          type='text'
-          className='input input-sm input-bordered mt-2 w-full'
-          placeholder='start date, eg: 2001-00-00'
+        <TextInput
+          placeholder='start date'
           value={startDate}
-          onInput={handleStartDateChange}
-        />
-        <input
-          type='text'
-          className='input input-sm input-bordered mt-2 w-full'
-          placeholder='end date, eg: 2010-00-00'
-          value={endDate}
-          onInput={handleEndDateChange}
+          setValue={setStartDate}
         />
 
-        <input
-          type='text'
-          className='input input-sm input-bordered mt-2 w-full'
-          placeholder='page url'
-          value={url}
-          onInput={handleUrlChange}
+        <TextInput
+          placeholder='end date'
+          value={endDate}
+          setValue={setEndDate}
         />
-        <input
-          type='text'
-          className='input input-sm input-bordered mt-2 w-full'
-          placeholder='page title'
+
+        <TextInput placeholder='source url' value={url} setValue={setUrl} />
+
+        <TextInput
+          placeholder='source title'
           value={title}
-          onInput={handleTitleChange}
+          setValue={setTitle}
         />
       </div>
 
@@ -245,7 +226,7 @@ export default function AddRelationshipForm() {
           <button className='btn btn-primary flex-1' onClick={handleSubmit}>
             Create
           </button>
-          <button className='btn btn-secondary flex-none' disabled>
+          <button className='btn btn-secondary flex-none' onClick={handleReset}>
             Reset
           </button>
         </div>

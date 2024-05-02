@@ -58,7 +58,7 @@ export default function RelationshipPicker({
       onChange={handleCategoryChange}
     >
       <option selected={category === null} disabled>
-        Relationship Type
+        category
       </option>
       {allowedCategories.map(([id, categoryName]) => (
         <option selected={id === category} value={id}>

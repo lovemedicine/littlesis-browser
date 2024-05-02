@@ -4,12 +4,12 @@ A chrome extension for easily adding data to LittleSis as you research on the we
 
 ### TODO
 
-- working reset button
 - notify of similar relationships
+- add category-specific relationship fields (eg, is_board, amount, etc)
+- fix github action
+- loading indicators
 - validate dates
 - validate url
-- add category-specific relationship fields (eg, is_board, amount, etc)
 - disallow relationships between an entity and itself
-- display success and error messages
-- support using previous relationship data as starting point for next relationship
+- display error messages
 - support queues of entities
