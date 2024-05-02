@@ -123,6 +123,31 @@ export async function createRelationship(
   return await response.json();
 }
 
+type EssentialRelationshipData = {
+  entity1_id: string;
+  entity2_id: string;
+  category_id: string;
+};
+
+export async function findSimilarRelationships(
+  token: string,
+  data: EssentialRelationshipData
+): Promise<{ url: string }[] | null> {
+  const params = new URLSearchParams(data).toString();
+  const url = baseUrl + '/relationships/find_similar?' + params;
+  const response = await fetch(url, {
+    method: 'GET',
+    mode: 'cors',
+    credentials: 'include',
+    headers: {
+      'X-CSRF-Token': token,
+    },
+  });
+
+  if (!response.ok) return null;
+  return await response.json();
+}
+
 export function openLoginTab() {
   return openNewTab(baseUrl + '/login');
 }

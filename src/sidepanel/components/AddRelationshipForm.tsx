@@ -3,7 +3,7 @@ import EntityPicker from './EntityPicker';
 import RelationshipPicker from './RelationshipPicker';
 import TextInput from './TextInput';
 import { TokenContext, getPageInfo } from '@src/util';
-import { createRelationship } from '@src/api';
+import { createRelationship, findSimilarRelationships } from '@src/api';
 import { Entity } from '@src/types';
 import RadioInput from './RadioInput';
 
@@ -12,7 +12,7 @@ type ValidationErrors = {
 };
 
 export default function AddRelationshipForm() {
-  const token = useContext(TokenContext);
+  const token = useContext(TokenContext) as string;
   const [entity1, setEntity1] = useState<Entity | null>(null);
   const [entity2, setEntity2] = useState<Entity | null>(null);
   const [categoryId, setCategoryId] = useState<number | null>(null);
@@ -30,6 +30,9 @@ export default function AddRelationshipForm() {
   );
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [successUrl, setSuccessUrl] = useState<string | null>(null);
+  const [similarRelationshipUrls, setSimilarRelationshipUrls] = useState<
+    string[]
+  >([]);
 
   useEffect(() => {
     async function setPageInfo() {
@@ -48,8 +51,25 @@ export default function AddRelationshipForm() {
   }, [entity1?.type, entity2?.type]);
 
   useEffect(() => {
+    setSuccessUrl(null);
     validateData();
   }, [entity1, entity2, categoryId, isCurrent, url, title]);
+
+  useEffect(() => {
+    async function checkSimilarRelationships() {
+      if (entity1?.id && entity2?.id && categoryId) {
+        const data = await findSimilarRelationships(token, {
+          entity1_id: entity1.id.toString(),
+          entity2_id: entity2.id.toString(),
+          category_id: categoryId.toString(),
+        });
+
+        setSimilarRelationshipUrls((data || []).map(rel => rel.url));
+      }
+    }
+
+    checkSimilarRelationships();
+  }, [entity1?.id, entity2?.id, categoryId]);
 
   function validateData() {
     const errors: ValidationErrors = {};
@@ -63,8 +83,6 @@ export default function AddRelationshipForm() {
   }
 
   async function handleSubmit() {
-    if (!token) return null;
-
     setSuccessUrl(null);
 
     if (Object.keys(validationErrors).length > 0) {
@@ -209,11 +227,25 @@ export default function AddRelationshipForm() {
       </div>
 
       <div className='absolute bottom-0 w-full p-2'>
+        {similarRelationshipUrls.length > 0 && (
+          <div className='mt-2 text-error'>
+            Similar relationships:
+            {similarRelationshipUrls.map(relUrl => (
+              <div>
+                <a href={relUrl} target='_blank'>
+                  {relUrl}
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
+
         {showValidationErrors && (
           <div className='mt-2 text-error'>
             {Object.values(validationErrors).join(', ')}
           </div>
         )}
+
         {successUrl && (
           <div className='mt-2 text-success'>
             Sucess!{' '}
@@ -222,6 +254,7 @@ export default function AddRelationshipForm() {
             </a>
           </div>
         )}
+
         <div className='mt-2 flex space-x-2'>
           <button className='btn btn-primary flex-1' onClick={handleSubmit}>
             Create
