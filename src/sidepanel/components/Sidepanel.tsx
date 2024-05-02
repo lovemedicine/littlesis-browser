@@ -23,16 +23,19 @@ export default function Sidepanel() {
   if (isLoading) return <TokenLoadingIndicator />;
 
   return (
-    <div className='p-1 text-lg'>
+    <div className='w-full'>
       {token && (
         <TokenContext.Provider value={token}>
           <AddRelationshipForm />
         </TokenContext.Provider>
       )}
       {!token && (
-        <>
-          Login to LittleSis then <button onClick={startup}>reload</button>
-        </>
+        <div className='p-1 text-lg'>
+          Login to LittleSis then{' '}
+          <button className='btn btn-outline btn-sm' onClick={startup}>
+            reload
+          </button>
+        </div>
       )}
     </div>
   );

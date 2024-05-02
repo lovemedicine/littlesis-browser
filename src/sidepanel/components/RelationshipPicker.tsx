@@ -47,14 +47,21 @@ export default function RelationshipPicker({
     );
   }, [type1, type2]);
 
+  function handleCategoryChange(event: any) {
+    setCategory(event.target.value);
+  }
+
   return (
     <select
       className='select select-bordered select-sm mt-2 w-full max-w-xs'
       disabled={Boolean(!type1 || !type2)}
+      onChange={handleCategoryChange}
     >
-      <option selected={category === null}>Relationship type</option>
+      <option selected={category === null} disabled>
+        Relationship Type
+      </option>
       {allowedCategories.map(([id, categoryName]) => (
-        <option selected={id === category} onClick={() => setCategory(id)}>
+        <option selected={id === category} value={id}>
           {categoryName}
         </option>
       ))}

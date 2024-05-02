@@ -4,10 +4,6 @@ export const TokenContext = createContext<string | null>(null);
 
 export function openNewTab(url: string) {
   chrome.tabs.query({ currentWindow: true }, tabs => {
-    console.log(
-      'tab urls',
-      tabs.map(tab => tab.url)
-    );
     const existingTab = tabs.find(tab => tab.url === url);
 
     if (existingTab !== undefined) {
@@ -15,6 +11,21 @@ export function openNewTab(url: string) {
     } else {
       chrome.tabs.create({ url });
     }
+  });
+}
+
+export async function getPageInfo(): Promise<{
+  url: string;
+  title: string;
+}> {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+      chrome.tabs.sendMessage(
+        tabs[0].id as number,
+        { message: 'getPageInfo' },
+        resolve
+      );
+    });
   });
 }
 

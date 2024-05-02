@@ -35,11 +35,11 @@ export default function CreateEntityForm({
   async function handleSubmit() {
     if (!token || !canSubmit) return;
     const entity = await createEntity(token, { name, blurb, type });
-    onCreate(entity);
+    if (entity) onCreate(entity);
   }
 
   return (
-    <div className='dropdown-content bg-base-200 top-8 z-50 max-h-96 w-full flex-col overflow-auto rounded-md p-3 text-sm'>
+    <div className='dropdown-content top-8 z-50 max-h-96 w-full flex-col overflow-auto rounded-md bg-base-200 p-3 text-sm'>
       <div className='relative'>
         <div
           className='absolute right-0 top-0 cursor-pointer'
@@ -94,7 +94,7 @@ export default function CreateEntityForm({
           <label for='org-type'>org</label>
           <div className='mt-2'>
             <button
-              className='btn btn-sm btn-neutral'
+              className='btn btn-neutral btn-sm'
               disabled={!canSubmit}
               onClick={handleSubmit}
             >

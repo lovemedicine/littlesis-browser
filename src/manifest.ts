@@ -6,13 +6,19 @@ const manifest: ManifestType = {
   name: 'LittleSis Browser Utils',
   version: packageJson.version,
   description: packageJson.description,
-  permissions: ['sidePanel', 'activeTab', 'storage'],
+  permissions: ['sidePanel', 'activeTab', 'storage', 'tabs'],
   action: {
     default_title: 'click to open side panel',
   },
   side_panel: {
     default_path: 'src/sidepanel/index.html',
   },
+  content_scripts: [
+    {
+      matches: ['http://*/*', 'https://*/*', '<all_urls>'],
+      js: ['src/content/index.js'],
+    },
+  ],
   icons: {
     '24': 'icon-24.png',
     '96': 'icon-96.png',
