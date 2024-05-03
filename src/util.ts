@@ -35,3 +35,7 @@ export function capitalize(str: string): string {
     .map(word => word[0].toUpperCase() + word.slice(1))
     .join(' ');
 }
+
+export function parseNumberString(value: string): any {
+  return value === '' ? null : value;
+}

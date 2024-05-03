@@ -8,7 +8,7 @@ const categories: CategoryOption[] = [
   [3, 'Membership', ['any', 'any']],
   [4, 'Family', ['person', 'person']],
   [5, 'Donation/Grant', ['any', 'any']],
-  [6, 'Serviced/Transaction', ['any', 'any']],
+  [6, 'Service/Transaction', ['any', 'any']],
   [7, 'Lobbying', ['any', 'any']],
   [8, 'Social', ['person', 'person']],
   [9, 'Professional', ['person', 'person']],

@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'preact/hooks';
 import EntityPicker from './EntityPicker';
 import RelationshipPicker from './RelationshipPicker';
 import TextInput from './TextInput';
+import ExtraFields from './ExtraFields';
 import { TokenContext, getPageInfo } from '@src/util';
 import { createRelationship, findSimilarRelationships } from '@src/api';
 import { Entity } from '@src/types';
@@ -18,11 +19,10 @@ export default function AddRelationshipForm() {
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [description1, setDescription1] = useState<string>('');
   const [description2, setDescription2] = useState<string>('');
-  const [isCurrent, setIsCurrent] = useState<'true' | 'false' | 'null' | null>(
-    null
-  );
+  const [isCurrent, setIsCurrent] = useState<'yes' | 'no' | 'null'>('null');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+  const [extraFields, setExtraFields] = useState<{ [key: string]: any }>({});
   const [url, setUrl] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
@@ -71,6 +71,10 @@ export default function AddRelationshipForm() {
     checkSimilarRelationships();
   }, [entity1?.id, entity2?.id, categoryId]);
 
+  useEffect(() => {
+    setExtraFields({});
+  }, [categoryId]);
+
   function validateData() {
     const errors: ValidationErrors = {};
     if (!entity1) errors.entity1 = 'Entity 1 is missing';
@@ -99,9 +103,10 @@ export default function AddRelationshipForm() {
         category_id: categoryId as number,
         description1: description1 || null,
         description2: description2 || null,
-        is_current: JSON.parse(isCurrent as string),
+        is_current: isCurrent,
         start_date: startDate || null,
         end_date: endDate || null,
+        ...extraFields,
       },
       reference: {
         url: url,
@@ -126,6 +131,7 @@ export default function AddRelationshipForm() {
     setValidationErrors({});
     setShowValidationErrors(false);
     setSuccessUrl(null);
+    setExtraFields({});
   }
 
   function swapEntities() {
@@ -197,10 +203,17 @@ export default function AddRelationshipForm() {
           setValue={setDescription2}
         />
 
+        {categoryId && (
+          <ExtraFields
+            categoryId={categoryId}
+            setExtraFields={setExtraFields}
+          />
+        )}
+
         <RadioInput
           name='is_current'
           value={isCurrent}
-          options={['true', 'false', 'null']}
+          options={['yes', 'no', 'null']}
           labels={['present', 'past', 'unknown']}
           setValue={setIsCurrent}
         />

@@ -32,7 +32,7 @@ export default function RadioInput({
             className='radio radio-xs'
             onChange={handleChange}
           />{' '}
-          <label for='yes-current' className='text-sm'>
+          <label for={name + '-' + value} className='text-sm'>
             {labels[index]}
           </label>
           &nbsp;&nbsp;&nbsp;
