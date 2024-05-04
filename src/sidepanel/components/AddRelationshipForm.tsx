@@ -239,22 +239,20 @@ export default function AddRelationshipForm() {
           <div className='my-auto flex-none'>
             {entity1 && entity2 && (
               <button
-                className='btn btn-circle'
+                className='btn btn-circle btn-outline input-bordered btn-sm'
                 onClick={swapEntities}
                 title='swap entities'
               >
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                  strokeWidth={1.5}
-                  stroke='currentColor'
-                  className='h-6 w-6'
+                  viewBox='0 0 20 20'
+                  fill='currentColor'
+                  className='h-5 w-5'
                 >
                   <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    d='M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5'
+                    fillRule='evenodd'
+                    d='M2.24 6.8a.75.75 0 0 0 1.06-.04l1.95-2.1v8.59a.75.75 0 0 0 1.5 0V4.66l1.95 2.1a.75.75 0 1 0 1.1-1.02l-3.25-3.5a.75.75 0 0 0-1.1 0L2.2 5.74a.75.75 0 0 0 .04 1.06Zm8 6.4a.75.75 0 0 0-.04 1.06l3.25 3.5a.75.75 0 0 0 1.1 0l3.25-3.5a.75.75 0 1 0-1.1-1.02l-1.95 2.1V6.75a.75.75 0 0 0-1.5 0v8.59l-1.95-2.1a.75.75 0 0 0-1.06-.04Z'
+                    clipRule='evenodd'
                   />
                 </svg>
               </button>
@@ -313,13 +311,36 @@ export default function AddRelationshipForm() {
           setValue={setEndDate}
         />
 
-        <TextInput placeholder='source url' value={url} setValue={setUrl} />
-
-        <TextInput
-          placeholder='source title'
-          value={title}
-          setValue={setTitle}
-        />
+        <div className='flex space-x-2'>
+          <div className='flex-1'>
+            <TextInput placeholder='source url' value={url} setValue={setUrl} />
+            <TextInput
+              placeholder='source title'
+              value={title}
+              setValue={setTitle}
+            />
+          </div>
+          <div className='my-auto flex-none'>
+            <button
+              className='btn btn-circle btn-outline input-bordered btn-sm'
+              onClick={setPageInfo}
+              title='update page url and title'
+            >
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                viewBox='0 0 20 20'
+                fill='currentColor'
+                className='h-5 w-5'
+              >
+                <path
+                  fillRule='evenodd'
+                  d='M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z'
+                  clipRule='evenodd'
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className='absolute bottom-0 w-full p-2'>
