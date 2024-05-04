@@ -1,6 +1,9 @@
 import PositionFields from './PositionFields';
 import EducationFields from './EducationFields';
+import MembershipFields from './MembershipFields';
 import DonationFields from './DonationFields';
+import TransactionFields from './TransactionFields';
+import OwnershipFields from './OwnershipFIelds';
 import { ExtraFieldsType } from './AddRelationshipForm';
 
 type Props = {
@@ -17,7 +20,10 @@ export default function ExtraFields({
   const Fields = {
     1: PositionFields,
     2: EducationFields,
+    3: MembershipFields,
     5: DonationFields,
+    6: TransactionFields,
+    10: OwnershipFields,
   }[categoryId];
 
   if (!Fields) return null;

@@ -87,7 +87,7 @@ type CreateRelationshipData = {
   relationship: {
     entity1_id: number;
     entity2_id: number;
-    category_id: number;
+    category_id: string;
     description1: string | null;
     description2: string | null;
     is_current: BooleanData;

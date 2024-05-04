@@ -2,7 +2,6 @@ import { useState, useEffect } from 'preact/hooks';
 import TextInput from './TextInput';
 import SelectInput from './SelectInput';
 import { ExtraFieldsType } from './AddRelationshipForm';
-import { parseNumberString } from '@src/util';
 
 type Props = {
   initValues: ExtraFieldsType;
@@ -30,14 +29,8 @@ export default function EducationFields({ initValues, setExtraFields }: Props) {
 
   return (
     <>
+      <SelectInput options={typeOptions} value={type} setValue={setType} />
       <SelectInput
-        placeholder='type'
-        options={typeOptions}
-        value={type}
-        setValue={setType}
-      />
-      <SelectInput
-        placeholder='degree'
         options={degreeOptions}
         value={degreeId}
         setValue={setDegreeId}
@@ -48,7 +41,7 @@ export default function EducationFields({ initValues, setExtraFields }: Props) {
 }
 
 const typeOptions: [string, string][] = [
-  ['null', 'type'],
+  ['', 'type'],
   ['Undergraduate', 'Undergraduate'],
   ['Graduate', 'Graduate'],
   ['High School', 'High School'],

@@ -2,7 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-input::placeholder {
+input::placeholder,
+select:invalid {
   font-style: italic;
-  opacity: 0.5;
+  @apply text-neutral-600;
 }
+
+/* option[value=''][disabled] {
+  display: none;
+} */

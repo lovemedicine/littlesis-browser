@@ -1,17 +1,17 @@
 type Props = {
-  placeholder: string;
   options: Array<[any, string]>;
   value: any;
   setValue: (value: any) => any;
   disabled?: boolean;
+  required?: boolean;
 };
 
 export default function SelectInput({
-  placeholder,
   options,
   value,
   setValue,
   disabled,
+  required,
 }: Props) {
   function handleChange(event: any) {
     const val = event.target.value;
@@ -20,12 +20,17 @@ export default function SelectInput({
 
   return (
     <select
+      required
       className='select select-bordered select-sm mt-2 w-full max-w-xs'
-      disabled={Boolean(disabled)}
+      // disabled={Boolean(disabled)}
       onChange={handleChange}
     >
       {options.map(([optionValue, name]) => (
-        <option selected={optionValue === value} value={optionValue}>
+        <option
+          selected={optionValue === value}
+          value={optionValue}
+          disabled={optionValue === ''}
+        >
           {name}
         </option>
       ))}

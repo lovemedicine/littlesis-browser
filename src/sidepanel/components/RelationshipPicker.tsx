@@ -4,7 +4,7 @@ import SelectInput from './SelectInput';
 type CategoryOption = [string, string, [string, string]];
 
 const categories: CategoryOption[] = [
-  ['', 'type', ['any', 'any']],
+  ['', 'relationship type', ['any', 'any']],
   ['1', 'Position', ['person', 'any']],
   ['2', 'Education', ['person', 'org']],
   ['3', 'Membership', ['any', 'any']],
@@ -51,13 +51,12 @@ export default function RelationshipPicker({
               );
             })
             .map(cat => [cat[0], cat[1]])
-        : []
+        : [['', 'relationship type']]
     );
   }, [type1, type2]);
 
   return (
     <SelectInput
-      placeholder='category'
       value={category}
       options={allowedCategories}
       disabled={Boolean(!type1 || !type2)}
