@@ -145,8 +145,6 @@ export default function AddRelationshipForm() {
     startDate,
     endDate,
     JSON.stringify(extraFields),
-    url,
-    title,
     similarRelationshipUrls.join(','),
   ]);
 
@@ -161,8 +159,6 @@ export default function AddRelationshipForm() {
       startDate,
       endDate,
       extraFields,
-      url,
-      title,
       similarRelationshipUrls,
     };
     chrome.storage.sync.set({
@@ -189,8 +185,6 @@ export default function AddRelationshipForm() {
       setStartDate(data.startDate);
       setEndDate(data.endDate);
       setExtraFields(data.extraFields);
-      setUrl(data.url);
-      setTitle(data.title);
       setSimilarRelationshipUrls(data.similarRelationshipUrls);
     }
   }
