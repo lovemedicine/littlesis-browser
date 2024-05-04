@@ -1,35 +1,46 @@
 import { useState, useEffect } from 'preact/hooks';
 import RadioInput from './RadioInput';
 import TextInput from './TextInput';
-import { parseNumberString } from '@src/util';
+import { ExtraFieldsType } from './AddRelationshipForm';
 
 type Props = {
-  setExtraFields: (values: { [key: string]: any }) => any;
+  initValues: ExtraFieldsType;
+  setExtraFields: (values: ExtraFieldsType) => any;
 };
 
-export default function PositionFields({ setExtraFields }: Props) {
-  const [isBoard, setIsBoard] = useState<'yes' | 'no' | 'null'>('null');
-  const [isExecutive, setIsExecutive] = useState<'yes' | 'no' | 'null'>('null');
-  const [isEmployee, setIsEmployee] = useState<'yes' | 'no' | 'null'>('null');
-  const [compensation, setCompensation] = useState<string>('');
+export default function PositionFields({ initValues, setExtraFields }: Props) {
+  const { description1: initTitle, position_attributes: initAttributes } =
+    initValues;
+  const [title, setTitle] = useState<string>(initTitle || '');
+  const [isBoard, setIsBoard] = useState<'yes' | 'no' | 'null'>(
+    initAttributes?.is_board || 'null'
+  );
+  const [isExecutive, setIsExecutive] = useState<'yes' | 'no' | 'null'>(
+    initAttributes?.is_executive || 'null'
+  );
+  const [isEmployee, setIsEmployee] = useState<'yes' | 'no' | 'null'>(
+    initAttributes?.is_employee || 'null'
+  );
+  const [compensation, setCompensation] = useState<string>(
+    initAttributes?.compensation ?? ''
+  );
 
   useEffect(() => {
     setExtraFields({
+      description1: title || null,
       position_attributes: {
         is_board: isBoard,
         is_executive: isExecutive,
         is_employee: isEmployee,
-        compensation: parseNumberString(compensation),
+        compensation,
       },
     });
-
-    return () => {
-      setExtraFields({});
-    };
-  }, [isBoard, isExecutive, isEmployee, compensation]);
+  }, [title, isBoard, isExecutive, isEmployee, compensation]);
 
   return (
     <>
+      <TextInput placeholder='title' value={title} setValue={setTitle} />
+
       <RadioInput
         name='is_board'
         value={isBoard}

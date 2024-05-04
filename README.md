@@ -4,8 +4,10 @@ A chrome extension for easily adding data to LittleSis as you research on the we
 
 ### TODO
 
-- add category-specific relationship fields (eg, is_board, amount, etc)
+- add extra fields for membership, etc
+- button to update url and title
 - tests
+- better typing for events
 - fix github action
 - loading indicators
 - validate dates

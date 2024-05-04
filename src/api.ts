@@ -81,6 +81,8 @@ export async function createEntity(
   return entity;
 }
 
+type BooleanData = 'yes' | 'no' | 'null';
+
 type CreateRelationshipData = {
   relationship: {
     entity1_id: number;
@@ -88,10 +90,21 @@ type CreateRelationshipData = {
     category_id: number;
     description1: string | null;
     description2: string | null;
-    is_current: true | false | null;
+    is_current: BooleanData;
     start_date: string | null;
     end_date: string | null;
   };
+  position_attributes?: {
+    is_board: BooleanData;
+    is_executive: BooleanData;
+    is_employee: BooleanData;
+    compensation: string | null;
+  };
+  education_attributes?: {
+    field: string | null;
+    degree_id: number | null;
+  };
+  amount?: string | null;
   reference: {
     url: string;
     name: string;

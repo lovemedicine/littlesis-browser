@@ -7,22 +7,27 @@ import { TokenContext, getPageInfo } from '@src/util';
 import { createRelationship, findSimilarRelationships } from '@src/api';
 import { Entity } from '@src/types';
 import RadioInput from './RadioInput';
+import { start } from 'repl';
 
 type ValidationErrors = {
   [key: string]: string;
 };
 
+export type ExtraFieldsType = { [key: string]: any };
+
 export default function AddRelationshipForm() {
   const token = useContext(TokenContext) as string;
   const [entity1, setEntity1] = useState<Entity | null>(null);
   const [entity2, setEntity2] = useState<Entity | null>(null);
-  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [categoryId, setCategoryId] = useState<string>('');
   const [description1, setDescription1] = useState<string>('');
   const [description2, setDescription2] = useState<string>('');
   const [isCurrent, setIsCurrent] = useState<'yes' | 'no' | 'null'>('null');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [extraFields, setExtraFields] = useState<{ [key: string]: any }>({});
+  const [extraFields, setExtraFields] = useState<{
+    [key: string]: ExtraFieldsType;
+  }>({});
   const [url, setUrl] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
@@ -35,18 +40,19 @@ export default function AddRelationshipForm() {
   >([]);
 
   useEffect(() => {
-    async function setPageInfo() {
-      const { url, title } = await getPageInfo();
-      setUrl(url || '');
-      setTitle(title || '');
+    async function init() {
+      await loadData();
+      if (!url) await setPageInfo();
     }
 
-    setPageInfo();
+    init();
+
+    return saveData;
   }, []);
 
   useEffect(() => {
     if (!entity1?.type || !entity2?.type) {
-      setCategoryId(null);
+      setCategoryId('');
     }
   }, [entity1?.type, entity2?.type]);
 
@@ -71,9 +77,11 @@ export default function AddRelationshipForm() {
     checkSimilarRelationships();
   }, [entity1?.id, entity2?.id, categoryId]);
 
-  useEffect(() => {
-    setExtraFields({});
-  }, [categoryId]);
+  async function setPageInfo() {
+    const { url, title } = await getPageInfo();
+    setUrl(url || '');
+    setTitle(title || '');
+  }
 
   function validateData() {
     const errors: ValidationErrors = {};
@@ -100,13 +108,13 @@ export default function AddRelationshipForm() {
       relationship: {
         entity1_id: (entity1 as Entity).id,
         entity2_id: (entity2 as Entity).id,
-        category_id: categoryId as number,
+        category_id: categoryId,
         description1: description1 || null,
         description2: description2 || null,
         is_current: isCurrent,
         start_date: startDate || null,
         end_date: endDate || null,
-        ...extraFields,
+        ...(extraFields[categoryId] || {}),
       },
       reference: {
         url: url,
@@ -119,26 +127,96 @@ export default function AddRelationshipForm() {
     setSuccessUrl(result.url);
   }
 
-  function handleReset() {
-    setEntity1(null);
-    setEntity2(null);
-    setCategoryId(null);
-    setDescription1('');
-    setDescription2('');
-    setIsCurrent(null);
-    setStartDate('');
-    setEndDate('');
-    setValidationErrors({});
-    setShowValidationErrors(false);
-    setSuccessUrl(null);
-    setExtraFields({});
-  }
-
   function swapEntities() {
     const entity1Copy = entity1;
     setEntity1(entity2);
     setEntity2(entity1Copy);
   }
+
+  useEffect(() => {
+    saveData();
+  }, [
+    entity1?.id,
+    entity2?.id,
+    categoryId,
+    description1,
+    description2,
+    isCurrent,
+    startDate,
+    endDate,
+    JSON.stringify(extraFields),
+    url,
+    title,
+    similarRelationshipUrls.join(','),
+  ]);
+
+  function saveData() {
+    const data = {
+      entity1,
+      entity2,
+      categoryId,
+      description1,
+      description2,
+      isCurrent,
+      startDate,
+      endDate,
+      extraFields,
+      url,
+      title,
+      similarRelationshipUrls,
+    };
+    chrome.storage.sync.set({
+      relationshipData: data,
+    });
+  }
+
+  async function getStoredData() {
+    const { relationshipData } =
+      await chrome.storage.sync.get('relationshipData');
+    return relationshipData;
+  }
+
+  async function loadData() {
+    const data = await getStoredData();
+
+    if (data) {
+      setEntity1(data.entity1);
+      setEntity2(data.entity2);
+      setCategoryId(data.categoryId);
+      setDescription1(data.description1);
+      setDescription2(data.description2);
+      setIsCurrent(data.isCurrent);
+      setStartDate(data.startDate);
+      setEndDate(data.endDate);
+      setExtraFields(data.extraFields);
+      setUrl(data.url);
+      setTitle(data.title);
+      setSimilarRelationshipUrls(data.similarRelationshipUrls);
+    }
+  }
+
+  function handleReset() {
+    setEntity1(null);
+    setEntity2(null);
+    setCategoryId('');
+    setDescription1('');
+    setDescription2('');
+    setIsCurrent('null');
+    setStartDate('');
+    setEndDate('');
+    setExtraFields({});
+    setValidationErrors({});
+    setShowValidationErrors(false);
+    setSuccessUrl(null);
+  }
+
+  function handleSetExtraFields(fields: ExtraFieldsType) {
+    if (categoryId) {
+      setExtraFields({ ...extraFields, [categoryId]: fields });
+    }
+  }
+
+  const showDescriptionInputs = ['4', '6', '8', '9', '12'].includes(categoryId);
 
   return (
     <div className='w-full'>
@@ -191,22 +269,27 @@ export default function AddRelationshipForm() {
           setCategory={setCategoryId}
         />
 
-        <TextInput
-          placeholder='description 1'
-          value={description1}
-          setValue={setDescription1}
-        />
+        {showDescriptionInputs && (
+          <>
+            <TextInput
+              placeholder='description 1'
+              value={description1}
+              setValue={setDescription1}
+            />
 
-        <TextInput
-          placeholder='description 2'
-          value={description2}
-          setValue={setDescription2}
-        />
+            <TextInput
+              placeholder='description 2'
+              value={description2}
+              setValue={setDescription2}
+            />
+          </>
+        )}
 
         {categoryId && (
           <ExtraFields
             categoryId={categoryId}
-            setExtraFields={setExtraFields}
+            initValues={extraFields}
+            setExtraFields={handleSetExtraFields}
           />
         )}
 
