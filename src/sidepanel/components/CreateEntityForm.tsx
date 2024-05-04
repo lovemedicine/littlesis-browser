@@ -32,7 +32,12 @@ export default function CreateEntityForm({
     <div className='dropdown-content top-8 z-50 max-h-96 w-full flex-col overflow-auto rounded-md bg-base-200 p-3 text-sm'>
       <div className='relative'>
         <strong>Create Entity</strong>
-        <TextInput placeholder={'name'} value={name} setValue={setName} />
+        <TextInput
+          placeholder={'name'}
+          value={name}
+          setValue={setName}
+          autoFocus={true}
+        />
 
         <TextInput placeholder={'blurb'} value={blurb} setValue={setBlurb} />
 

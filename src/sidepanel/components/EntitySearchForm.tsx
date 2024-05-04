@@ -5,6 +5,7 @@ import CreateEntityForm from './CreateEntityForm';
 import { Entity } from '@src/types';
 import { searchForEntity } from '@src/api';
 import { capitalize } from '@src/util';
+import useHotkeys from '@src/useHotKeys';
 
 type Props = {
   placeholder: string;
@@ -15,7 +16,15 @@ export default function EntitySearchForm({ placeholder, onSelect }: Props) {
   const [entities, setEntities] = useState<Entity[]>([]);
   const [query, setQuery] = useState<string>('');
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+
+  useHotkeys('enter', () => {
+    console.log(entities);
+    if (entities.length > 0) {
+      onSelect(entities[0]);
+    } else {
+      setShowCreateForm(true);
+    }
+  });
 
   const handleInputChange = useMemo(() => {
     return debounce(async (event: any) => {
@@ -29,7 +38,6 @@ export default function EntitySearchForm({ placeholder, onSelect }: Props) {
   return (
     <div
       className={'dropdown w-full' + (query.length > 1 ? ' dropdown-open' : '')}
-      ref={ref}
     >
       <label className='input input-sm input-bordered flex items-center gap-2'>
         <input

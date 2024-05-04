@@ -90,6 +90,7 @@
   },
   "dependencies": {
     "@github/mini-throttle": "^2.1.1",
-    "daisyui": "^4.10.2"
+    "daisyui": "^4.10.2",
+    "hotkeys-js": "^3.13.7"
   }
 }
