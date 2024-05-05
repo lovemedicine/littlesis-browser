@@ -11,8 +11,8 @@ export default function TextInput({
   setValue,
   autoFocus,
 }: Props) {
-  function handleChange(event: any) {
-    setValue(event.target.value);
+  function handleChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+    setValue(event.currentTarget.value);
   }
 
   return (
@@ -22,7 +22,7 @@ export default function TextInput({
       className='input input-sm input-bordered mt-2 w-full'
       placeholder={placeholder}
       value={value}
-      onInput={handleChange}
+      onChange={handleChange}
     />
   );
 }

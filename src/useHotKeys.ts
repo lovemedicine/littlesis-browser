@@ -1,5 +1,4 @@
-// from https://gist.github.com/sarahdayan/47cb88b6a8163500967ffe4c85ad1622
-// with minor edits to make memoization optional
+// copied from https://gist.github.com/sarahdayan/47cb88b6a8163500967ffe4c85ad1622
 
 import hotkeys, { HotkeysEvent } from 'hotkeys-js';
 import { useEffect, useCallback } from 'preact/hooks';
@@ -14,19 +13,16 @@ import { useEffect, useCallback } from 'preact/hooks';
 function useHotkeys<Dependencies>(
   keys: string,
   callback: (event: KeyboardEvent, handler: HotkeysEvent) => void,
-  memoize: boolean = false,
   dependencies: Dependencies[] = []
 ) {
-  const callbackToExecute = memoize
-    ? useCallback(callback, dependencies)
-    : callback;
+  const memoizedCallback = useCallback(callback, dependencies);
 
   useEffect(() => {
     hotkeys.filter = () => true;
-    hotkeys(keys, callbackToExecute);
+    hotkeys(keys, memoizedCallback);
 
     return () => hotkeys.unbind(keys);
-  }, [keys, callbackToExecute]);
+  }, [keys, memoizedCallback]);
 }
 
 export default useHotkeys;

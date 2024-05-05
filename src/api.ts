@@ -164,3 +164,46 @@ export async function findSimilarRelationships(
 export function openLoginTab() {
   return openNewTab(baseUrl + '/login');
 }
+
+type CategoryOption = [string, string, [string, string]];
+
+export const categories: CategoryOption[] = [
+  ['', 'relationship type', ['any', 'any']],
+  ['1', 'Position', ['person', 'any']],
+  ['2', 'Education', ['person', 'org']],
+  ['3', 'Membership', ['any', 'org']],
+  ['4', 'Family', ['person', 'person']],
+  ['5', 'Donation/Grant', ['any', 'any']],
+  ['6', 'Service/Transaction', ['any', 'any']],
+  ['7', 'Lobbying', ['any', 'any']],
+  ['8', 'Social', ['person', 'person']],
+  ['9', 'Professional', ['person', 'person']],
+  ['10', 'Ownership', ['any', 'org']],
+  ['11', 'Hierarchy', ['org', 'org']],
+  ['12', 'Generic', ['any', 'any']],
+];
+
+export function getAllowedCategories(
+  type1?: string,
+  type2?: string
+): [string, string][] {
+  if (!type1 || !type2) return [['', 'relationship type']];
+
+  return categories
+    .filter(cat => {
+      const [t1, t2] = cat[2];
+      return (t1 === 'any' || t1 === type1) && (t2 === 'any' || t2 === type2);
+    })
+    .map(cat => [cat[0], cat[1]]);
+}
+
+export function isAllowedCategory(
+  type1: string | undefined,
+  type2: string | undefined,
+  categoryId: string
+) {
+  const allowedCategoryIds = getAllowedCategories(type1, type2).map(
+    category => category[0]
+  );
+  return allowedCategoryIds.includes(categoryId);
+}

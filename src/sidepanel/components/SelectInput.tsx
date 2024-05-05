@@ -2,19 +2,11 @@ type Props = {
   options: Array<[any, string]>;
   value: any;
   setValue: (value: any) => any;
-  disabled?: boolean;
-  required?: boolean;
 };
 
-export default function SelectInput({
-  options,
-  value,
-  setValue,
-  disabled,
-  required,
-}: Props) {
-  function handleChange(event: any) {
-    const val = event.target.value;
+export default function SelectInput({ options, value, setValue }: Props) {
+  function handleChange(event: JSX.TargetedEvent<HTMLSelectElement, Event>) {
+    const val = event.currentTarget.value;
     setValue(val === 'null' ? null : val);
   }
 
@@ -22,7 +14,6 @@ export default function SelectInput({
     <select
       required
       className='select select-bordered select-sm mt-2 w-full max-w-xs'
-      // disabled={Boolean(disabled)}
       onChange={handleChange}
     >
       {options.map(([optionValue, name]) => (

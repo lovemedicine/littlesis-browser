@@ -4,7 +4,11 @@ import RelationshipPicker from './RelationshipPicker';
 import TextInput from './TextInput';
 import ExtraFields from './ExtraFields';
 import { TokenContext, getPageInfo } from '@src/util';
-import { createRelationship, findSimilarRelationships } from '@src/api';
+import {
+  createRelationship,
+  findSimilarRelationships,
+  isAllowedCategory,
+} from '@src/api';
 import { Entity } from '@src/types';
 import RadioInput from './RadioInput';
 import { start } from 'repl';
@@ -51,7 +55,11 @@ export default function AddRelationshipForm() {
   }, []);
 
   useEffect(() => {
-    if (!entity1?.type || !entity2?.type) {
+    if (
+      !entity1?.type ||
+      !entity2?.type ||
+      !isAllowedCategory(entity1?.type, entity2?.type, categoryId)
+    ) {
       setCategoryId('');
     }
   }, [entity1?.type, entity2?.type]);

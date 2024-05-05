@@ -5,7 +5,6 @@ A chrome extension for easily adding data to LittleSis as you research on the we
 ### TODO
 
 - tests
-- better types for events
 - fix github action
 - loading indicators
 - validate dates

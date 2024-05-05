@@ -13,8 +13,8 @@ export default function RadioInput({
   labels,
   setValue,
 }: Props) {
-  function handleChange(event: any) {
-    setValue(event.target.value);
+  function handleChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+    setValue(event.currentTarget.value);
   }
 
   if (labels === undefined) labels = options;
