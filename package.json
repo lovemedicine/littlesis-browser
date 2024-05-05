@@ -10,7 +10,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "nodemon",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:cov": "jest --coverage",
     "format": "prettier src/ scripts/ --write"
   },
