@@ -19,13 +19,16 @@ export default function CreateEntityForm({
   const [name, setName] = useState<string>(defaultName || '');
   const [blurb, setBlurb] = useState<string>('');
   const [type, setType] = useState<'person' | 'org' | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const token = useContext(TokenContext);
   const canSubmit = type && name.length > 2;
 
   async function handleSubmit() {
     if (!token || !canSubmit) return;
+    setIsSaving(true);
     const entity = await createEntity(token, { name, blurb, type });
     if (entity) onCreate(entity);
+    setIsSaving(false);
   }
 
   return (
@@ -51,10 +54,13 @@ export default function CreateEntityForm({
         <div className='mt-2'>
           <button
             className='btn btn-neutral btn-sm'
-            disabled={!canSubmit}
+            disabled={!canSubmit || isSaving}
             onClick={handleSubmit}
           >
-            Create
+            {!isSaving && 'Create'}
+            {isSaving && (
+              <span className='loading loading-spinner loading-sm relative ml-2'></span>
+            )}
           </button>
         </div>
 

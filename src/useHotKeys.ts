@@ -8,21 +8,25 @@ import { useEffect, useCallback } from 'preact/hooks';
  *
  * @param keys A comma-separated list of hotkeys to trigger the callback on.
  * @param callback A callback function to execute when keys are pressed.
+ * @param memoize Optional flag to memoize callback.
  * @param dependencies A list of dependencies.
  */
 function useHotkeys<Dependencies>(
   keys: string,
   callback: (event: KeyboardEvent, handler: HotkeysEvent) => void,
+  memoize: boolean = false,
   dependencies: Dependencies[] = []
 ) {
-  const memoizedCallback = useCallback(callback, dependencies);
+  const callbackToExecute = memoize
+    ? useCallback(callback, dependencies)
+    : callback;
 
   useEffect(() => {
     hotkeys.filter = () => true;
-    hotkeys(keys, memoizedCallback);
+    hotkeys(keys, callbackToExecute);
 
     return () => hotkeys.unbind(keys);
-  }, [keys, memoizedCallback]);
+  }, [keys, callbackToExecute]);
 }
 
 export default useHotkeys;

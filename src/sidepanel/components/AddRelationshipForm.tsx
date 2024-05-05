@@ -42,6 +42,7 @@ export default function AddRelationshipForm() {
   const [similarRelationshipUrls, setSimilarRelationshipUrls] = useState<
     string[]
   >([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -112,6 +113,8 @@ export default function AddRelationshipForm() {
       setShowValidationErrors(false);
     }
 
+    setIsSaving(true);
+
     const submitData = {
       relationship: {
         entity1_id: (entity1 as Entity).id,
@@ -131,6 +134,7 @@ export default function AddRelationshipForm() {
     };
 
     const result = await createRelationship(token, submitData);
+    setIsSaving(false);
     if (!result) return null;
     setSuccessUrl(result.url);
   }
@@ -375,10 +379,20 @@ export default function AddRelationshipForm() {
         )}
 
         <div className='mt-2 flex space-x-2'>
-          <button className='btn btn-primary flex-1' onClick={handleSubmit}>
-            Create
+          <button
+            className='btn btn-primary flex-1 text-lg'
+            onClick={handleSubmit}
+            disabled={isSaving}
+          >
+            {!isSaving && 'Create'}
+            {isSaving && (
+              <span className='loading loading-spinner loading-sm relative ml-2'></span>
+            )}
           </button>
-          <button className='btn btn-secondary flex-none' onClick={handleReset}>
+          <button
+            className='btn btn-secondary flex-none text-lg'
+            onClick={handleReset}
+          >
             Reset
           </button>
         </div>

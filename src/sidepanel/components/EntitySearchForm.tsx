@@ -17,17 +17,17 @@ export default function EntitySearchForm({ placeholder, onSelect }: Props) {
   const [query, setQuery] = useState<string>('');
   const [showCreateForm, setShowCreateForm] = useState(false);
 
-  useHotkeys(
-    'enter',
-    () => {
-      if (entities.length > 0) {
-        onSelect(entities[0]);
-      } else {
-        setShowCreateForm(true);
-      }
-    },
-    [entities[0]?.id]
-  );
+  useHotkeys('enter', () => {
+    handleEnterKey();
+  });
+
+  function handleEnterKey() {
+    if (entities.length > 0) {
+      onSelect(entities[0]);
+    } else {
+      setShowCreateForm(true);
+    }
+  }
 
   const handleInputChange = useMemo(() => {
     return debounce(async (event: any) => {

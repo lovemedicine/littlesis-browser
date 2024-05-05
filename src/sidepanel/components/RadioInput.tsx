@@ -20,7 +20,7 @@ export default function RadioInput({
   if (labels === undefined) labels = options;
 
   return (
-    <div className='mt-2'>
+    <div className='ml-1 mt-2'>
       {options.map((option, index) => (
         <span key={value}>
           <input
