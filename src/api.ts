@@ -117,10 +117,14 @@ type CreateRelationshipResponseData = {
   url: string;
 };
 
+type CreateRelationshipError = {
+  error: string[];
+};
+
 export async function createRelationship(
   token: string,
   data: CreateRelationshipData
-): Promise<CreateRelationshipResponseData | null> {
+): Promise<CreateRelationshipResponseData | CreateRelationshipError> {
   const response = await fetch(baseUrl + '/relationships', {
     method: 'POST',
     mode: 'cors',
@@ -132,7 +136,6 @@ export async function createRelationship(
     body: JSON.stringify(data),
   });
 
-  if (!response.ok) return null;
   return await response.json();
 }
 

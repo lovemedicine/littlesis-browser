@@ -4,6 +4,7 @@ import RelationshipPicker from './RelationshipPicker';
 import TextInput from './TextInput';
 import RadioInput from './RadioInput';
 import ExtraFields from './ExtraFields';
+import Queue from './Queue';
 import { TokenContext, getPageInfo } from '@src/util';
 import {
   createRelationship,
@@ -43,6 +44,10 @@ export default function AddRelationshipForm() {
     string[]
   >([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [createRelationshipErrors, setCreateRelationshipErrors] = useState<
+    string[] | null
+  >(null);
+  const [showQueue, setShowQueue] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -108,6 +113,7 @@ export default function AddRelationshipForm() {
 
   async function handleSubmit() {
     setSuccessUrl(null);
+    setCreateRelationshipErrors(null);
 
     if (Object.keys(validationErrors).length > 0) {
       setShowValidationErrors(true);
@@ -138,8 +144,12 @@ export default function AddRelationshipForm() {
 
     const result = await createRelationship(token, submitData);
     setIsSaving(false);
-    if (!result) return null;
-    setSuccessUrl(result.url);
+
+    if ('url' in result) {
+      setSuccessUrl(result.url);
+    } else {
+      setCreateRelationshipErrors(result.error);
+    }
   }
 
   function swapEntities() {
@@ -217,6 +227,7 @@ export default function AddRelationshipForm() {
     setValidationErrors({});
     setShowValidationErrors(false);
     setSuccessUrl(null);
+    setCreateRelationshipErrors(null);
   }
 
   function handleSetExtraFields(fields: ExtraFieldsType) {
@@ -225,12 +236,19 @@ export default function AddRelationshipForm() {
     }
   }
 
+  function openQueue() {
+    setShowQueue(true);
+  }
+
+  function closeQueue() {
+    setShowQueue(false);
+  }
+
   const showDescriptionInputs = ['4', '6', '8', '9', '12'].includes(categoryId);
 
   return (
     <div className='w-full'>
       <div className='p-2'>
-        <div className='text-xl'>Create Relationship</div>
         <div className='flex space-x-2'>
           <div className='flex-1'>
             <EntityPicker
@@ -367,9 +385,19 @@ export default function AddRelationshipForm() {
         )}
 
         {showValidationErrors && (
-          <div className='mt-2 text-error'>
-            {Object.values(validationErrors).join(', ')}
-          </div>
+          <ul className='mt-2 text-error'>
+            {Object.values(validationErrors).map(error => (
+              <li>{error}</li>
+            ))}
+          </ul>
+        )}
+
+        {createRelationshipErrors && (
+          <ul className='mt-2 text-error'>
+            {createRelationshipErrors.map(error => (
+              <li>{error}</li>
+            ))}
+          </ul>
         )}
 
         {successUrl && (
@@ -398,8 +426,15 @@ export default function AddRelationshipForm() {
           >
             Reset
           </button>
+          <button
+            className='btn btn-accent flex-none text-lg'
+            onClick={openQueue}
+          >
+            Queue
+          </button>
         </div>
       </div>
+      {showQueue && <Queue onClose={closeQueue} />}
     </div>
   );
 }
