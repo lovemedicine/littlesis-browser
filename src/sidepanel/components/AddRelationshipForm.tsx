@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'preact/hooks';
 import EntityPicker from './EntityPicker';
 import RelationshipPicker from './RelationshipPicker';
 import TextInput from './TextInput';
+import RadioInput from './RadioInput';
 import ExtraFields from './ExtraFields';
 import { TokenContext, getPageInfo } from '@src/util';
 import {
@@ -9,9 +10,8 @@ import {
   findSimilarRelationships,
   isAllowedCategory,
 } from '@src/api';
+import { validateDate } from '@src/validation';
 import { Entity } from '@src/types';
-import RadioInput from './RadioInput';
-import { start } from 'repl';
 
 type ValidationErrors = {
   [key: string]: string;
@@ -68,7 +68,7 @@ export default function AddRelationshipForm() {
   useEffect(() => {
     setSuccessUrl(null);
     validateData();
-  }, [entity1, entity2, categoryId, isCurrent, url, title]);
+  }, [entity1, entity2, categoryId, isCurrent, startDate, endDate, url, title]);
 
   useEffect(() => {
     async function checkSimilarRelationships() {
@@ -93,12 +93,15 @@ export default function AddRelationshipForm() {
   }
 
   function validateData() {
-    const errors: ValidationErrors = {};
-    if (!entity1) errors.entity1 = 'Entity 1 is missing';
-    if (!entity2) errors.entity2 = 'Entity 2 is missing';
+    let errors: ValidationErrors = {};
+    if (!entity1?.id) errors.entity1 = 'Entity 1 is missing';
+    if (!entity2?.id) errors.entity2 = 'Entity 2 is missing';
     if (!categoryId) errors.categoryId = 'Relationship type is missing';
     if (isCurrent == null) errors.isCurrent = 'Past/current is missing';
+    if (!validateDate(startDate)) errors.startDate = 'Invalid start date';
+    if (!validateDate(endDate)) errors.endDate = 'Invalid end date';
     if (!url) errors.url = 'Source URL is missing';
+    if (url && !URL.canParse(url)) errors.url = 'Invalid source URL';
     if (!title) errors.title = 'Source title is missing';
     setValidationErrors(errors);
   }

@@ -4,8 +4,6 @@ A chrome extension for easily adding data to LittleSis as you research on the we
 
 ### TODO
 
-- validate dates
-- validate url
 - validate extra fields
 - disallow relationships between an entity and itself
 - display error messages
