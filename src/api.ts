@@ -190,12 +190,13 @@ export function getAllowedCategories(
   type1?: string,
   type2?: string
 ): [string, string][] {
-  if (!type1 || !type2) return [['', 'relationship type']];
-
   return categories
     .filter(cat => {
       const [t1, t2] = cat[2];
-      return (t1 === 'any' || t1 === type1) && (t2 === 'any' || t2 === type2);
+      return (
+        (!type1 || t1 === 'any' || t1 === type1) &&
+        (!type2 || t2 === 'any' || t2 === type2)
+      );
     })
     .map(cat => [cat[0], cat[1]]);
 }

@@ -5,7 +5,7 @@ import TextInput from './TextInput';
 import RadioInput from './RadioInput';
 import ExtraFields from './ExtraFields';
 import Queue from './Queue';
-import { TokenContext, getPageInfo } from '@src/util';
+import { TokenContext, getPageInfo, nextQueueItem } from '@src/util';
 import {
   createRelationship,
   findSimilarRelationships,
@@ -22,6 +22,8 @@ export type ExtraFieldsType = { [key: string]: any };
 
 export default function AddRelationshipForm() {
   const token = useContext(TokenContext) as string;
+  const [entity1Query, setEntity1Query] = useState('');
+  const [entity2Query, setEntity2Query] = useState('');
   const [entity1, setEntity1] = useState<Entity | null>(null);
   const [entity2, setEntity2] = useState<Entity | null>(null);
   const [categoryId, setCategoryId] = useState<string>('');
@@ -48,6 +50,7 @@ export default function AddRelationshipForm() {
     string[] | null
   >(null);
   const [showQueue, setShowQueue] = useState(false);
+  const [queue, setQueue] = useState<string>('');
 
   useEffect(() => {
     async function init() {
@@ -61,31 +64,28 @@ export default function AddRelationshipForm() {
   }, []);
 
   useEffect(() => {
-    if (
-      !entity1?.type ||
-      !entity2?.type ||
-      !isAllowedCategory(entity1?.type, entity2?.type, categoryId)
-    ) {
+    if (!isAllowedCategory(entity1?.type, entity2?.type, categoryId)) {
       setCategoryId('');
     }
   }, [entity1?.type, entity2?.type]);
 
   useEffect(() => {
-    setSuccessUrl(null);
     validateData();
   }, [entity1, entity2, categoryId, isCurrent, startDate, endDate, url, title]);
 
   useEffect(() => {
     async function checkSimilarRelationships() {
+      let data;
+
       if (entity1?.id && entity2?.id && categoryId) {
-        const data = await findSimilarRelationships(token, {
+        data = await findSimilarRelationships(token, {
           entity1_id: entity1.id.toString(),
           entity2_id: entity2.id.toString(),
           category_id: categoryId.toString(),
         });
-
-        setSimilarRelationshipUrls((data || []).map(rel => rel.url));
       }
+
+      setSimilarRelationshipUrls((data || []).map(rel => rel.url));
     }
 
     checkSimilarRelationships();
@@ -103,8 +103,9 @@ export default function AddRelationshipForm() {
     if (!entity2?.id) errors.entity2 = 'Entity 2 is missing';
     if (!categoryId) errors.categoryId = 'Relationship type is missing';
     if (isCurrent == null) errors.isCurrent = 'Past/current is missing';
-    if (!validateDate(startDate)) errors.startDate = 'Invalid start date';
-    if (!validateDate(endDate)) errors.endDate = 'Invalid end date';
+    if (startDate && !validateDate(startDate))
+      errors.startDate = 'Invalid start date';
+    if (endDate && !validateDate(endDate)) errors.endDate = 'Invalid end date';
     if (!url) errors.url = 'Source URL is missing';
     if (url && !URL.canParse(url)) errors.url = 'Invalid source URL';
     if (!title) errors.title = 'Source title is missing';
@@ -145,11 +146,13 @@ export default function AddRelationshipForm() {
     const result = await createRelationship(token, submitData);
     setIsSaving(false);
 
-    if ('url' in result) {
-      setSuccessUrl(result.url);
-    } else {
+    if ('error' in result) {
       setCreateRelationshipErrors(result.error);
+      return;
     }
+
+    setSuccessUrl(result.url);
+    applyQueueItem();
   }
 
   function swapEntities() {
@@ -171,6 +174,7 @@ export default function AddRelationshipForm() {
     endDate,
     JSON.stringify(extraFields),
     similarRelationshipUrls.join(','),
+    queue,
   ]);
 
   function saveData() {
@@ -185,6 +189,7 @@ export default function AddRelationshipForm() {
       endDate,
       extraFields,
       similarRelationshipUrls,
+      queue,
     };
     chrome.storage.sync.set({
       relationshipData: data,
@@ -211,10 +216,13 @@ export default function AddRelationshipForm() {
       setEndDate(data.endDate);
       setExtraFields(data.extraFields);
       setSimilarRelationshipUrls(data.similarRelationshipUrls);
+      setQueue(data.queue);
     }
   }
 
   function handleReset() {
+    setEntity1Query('');
+    setEntity2Query('');
     setEntity1(null);
     setEntity2(null);
     setCategoryId('');
@@ -244,7 +252,29 @@ export default function AddRelationshipForm() {
     setShowQueue(false);
   }
 
+  function applyQueueItem() {
+    const [newQueue, item] = nextQueueItem(queue);
+
+    if (!item) return;
+
+    Object.entries(item).forEach(([key, value]) => {
+      switch (key) {
+        case 'entity1':
+          setEntity1(null);
+          setEntity1Query(value);
+          break;
+        case 'entity2':
+          setEntity2(null);
+          setEntity2Query(value);
+          break;
+      }
+    });
+
+    setQueue(newQueue);
+  }
+
   const showDescriptionInputs = ['4', '6', '8', '9', '12'].includes(categoryId);
+  console.log('entity1 query', entity1Query);
 
   return (
     <div className='w-full'>
@@ -254,12 +284,14 @@ export default function AddRelationshipForm() {
             <EntityPicker
               placeholder='entity 1'
               entity={entity1}
+              entityQuery={entity1Query}
               setEntity={setEntity1}
             />
 
             <EntityPicker
               placeholder='entity 2'
               entity={entity2}
+              entityQuery={entity2Query}
               setEntity={setEntity2}
             />
           </div>
@@ -411,7 +443,7 @@ export default function AddRelationshipForm() {
 
         <div className='mt-2 flex space-x-2'>
           <button
-            className='btn btn-primary flex-1 text-lg'
+            className='text-md btn btn-primary flex-1'
             onClick={handleSubmit}
             disabled={isSaving}
           >
@@ -421,20 +453,29 @@ export default function AddRelationshipForm() {
             )}
           </button>
           <button
-            className='btn btn-secondary flex-none text-lg'
+            className='text-md btn btn-secondary flex-none'
             onClick={handleReset}
           >
             Reset
           </button>
           <button
-            className='btn btn-accent flex-none text-lg'
+            className='text-md btn btn-accent flex-none'
+            onClick={applyQueueItem}
+          >
+            Next
+          </button>
+
+          <button
+            className='text-md btn btn-accent flex-none'
             onClick={openQueue}
           >
             Queue
           </button>
         </div>
       </div>
-      {showQueue && <Queue onClose={closeQueue} />}
+      {showQueue && (
+        <Queue onClose={closeQueue} queue={queue} setQueue={setQueue} />
+      )}
     </div>
   );
 }

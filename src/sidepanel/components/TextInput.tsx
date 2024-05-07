@@ -1,7 +1,7 @@
 type Props = {
   placeholder: string;
   value: any;
-  setValue: (value: any) => any;
+  setValue: (value: string) => any;
   autoFocus?: boolean;
 };
 

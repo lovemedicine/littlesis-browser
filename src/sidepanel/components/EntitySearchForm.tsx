@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'preact/hooks';
+import { useState, useCallback, useEffect } from 'preact/hooks';
 import { debounce } from '@github/mini-throttle';
 import EntitySearchResults from './EntitySearchResults';
 import CreateEntityForm from './CreateEntityForm';
@@ -9,34 +9,54 @@ import useHotkeys from '@src/useHotKeys';
 
 type Props = {
   placeholder: string;
+  defaultQuery: string;
   onSelect: (entity: Entity) => any;
 };
 
-export default function EntitySearchForm({ placeholder, onSelect }: Props) {
+export default function EntitySearchForm({
+  placeholder,
+  defaultQuery,
+  onSelect,
+}: Props) {
+  const [query, setQuery] = useState(defaultQuery);
   const [entities, setEntities] = useState<Entity[]>([]);
-  const [query, setQuery] = useState<string>('');
   const [showCreateForm, setShowCreateForm] = useState(false);
 
-  useHotkeys('enter', () => {
-    handleEnterKey();
-  });
+  console.log(placeholder, 'search form default query', defaultQuery);
+  console.log(placeholder, 'search form query', query);
 
-  function handleEnterKey() {
+  useHotkeys('enter', () => {
     if (entities.length > 0) {
       onSelect(entities[0]);
     } else {
       setShowCreateForm(true);
     }
-  }
+  });
 
-  const handleInputChange = useMemo(() => {
-    return debounce(async (event: any) => {
-      const query = event.target.value.trim();
-      setEntities(await searchForEntity(query));
-      setQuery(query);
-      if (query.length === 0) setShowCreateForm(false);
-    }, 200);
-  }, []);
+  const processQuery = useCallback(
+    debounce(async (query: string) => {
+      if (query.length === 0) {
+        setShowCreateForm(false);
+      } else {
+        setEntities(await searchForEntity(query));
+      }
+    }, 200),
+    []
+  );
+
+  useEffect(() => {
+    processQuery(query);
+  }, [query]);
+
+  useEffect(() => {
+    setQuery(defaultQuery);
+  }, [defaultQuery]);
+
+  function handleInputChange(
+    event: JSX.TargetedEvent<HTMLInputElement, Event>
+  ) {
+    setQuery(event.currentTarget.value);
+  }
 
   return (
     <div
@@ -47,6 +67,7 @@ export default function EntitySearchForm({ placeholder, onSelect }: Props) {
           type='text'
           className='grow'
           placeholder={placeholder}
+          value={query}
           onInput={handleInputChange}
         />
         <svg

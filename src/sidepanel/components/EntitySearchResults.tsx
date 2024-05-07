@@ -16,11 +16,11 @@ export default function EntitySearchResults({
   return (
     <div
       className={
-        'dropdown-content bg-base-200 top-8 z-50 max-h-96 w-full flex-col overflow-auto rounded-md' +
+        'dropdown-content top-8 z-10 max-h-96 w-full flex-col overflow-auto rounded-md bg-base-200' +
         (show ? '' : ' hidden')
       }
     >
-      <ul className='menu menu-compact'>
+      <ul className='menu-compact menu'>
         {!entities.length && (
           <div className='p-2'>
             <strong>No entities found.</strong>
@@ -34,7 +34,7 @@ export default function EntitySearchResults({
               onClick={() => {
                 onSelect(entity);
               }}
-              className='border-b-base-content/10 w-full border-b'
+              className='w-full border-b border-b-base-content/10'
             >
               <button title={entity.blurb}>
                 <span className='w-full truncate'>
@@ -45,7 +45,7 @@ export default function EntitySearchResults({
             </li>
           );
         })}
-        <li key={0} className='border-b-base-content/10 w-full border-b'>
+        <li key={0} className='w-full border-b border-b-base-content/10'>
           <button onClick={onShowCreateForm}>
             <svg
               xmlns='http://www.w3.org/2000/svg'
