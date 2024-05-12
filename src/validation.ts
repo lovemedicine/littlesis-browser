@@ -1,4 +1,8 @@
 export function validateDate(date: string): boolean {
+  const yearMatch = date.match(/^(19|20)\d{2}$/);
+
+  if (yearMatch) return true;
+
   const match = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
   if (!match) return false;
