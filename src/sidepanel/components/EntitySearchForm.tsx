@@ -22,9 +22,6 @@ export default function EntitySearchForm({
   const [entities, setEntities] = useState<Entity[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
 
-  console.log(placeholder, 'search form default query', defaultQuery);
-  console.log(placeholder, 'search form query', query);
-
   useHotkeys('enter', () => {
     if (entities.length > 0) {
       onSelect(entities[0]);

@@ -20,8 +20,10 @@ const manifest: ManifestType = {
     },
   ],
   icons: {
-    '24': 'icon-24.png',
+    '16': 'icon-16.png',
+    '24': 'icon-48.png',
     '96': 'icon-96.png',
+    '128': 'icon-128.png',
   },
   background: { service_worker: 'src/background/index.js' },
   host_permissions: ['https://littlesis.org/*', 'http://localhost:8080/*'],

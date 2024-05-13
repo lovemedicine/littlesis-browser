@@ -5,7 +5,12 @@ import TextInput from './TextInput';
 import RadioInput from './RadioInput';
 import ExtraFields from './ExtraFields';
 import Queue from './Queue';
-import { TokenContext, getPageInfo, nextQueueItem } from '@src/util';
+import {
+  TokenContext,
+  getPageInfo,
+  nextQueueItem,
+  countQueueItems,
+} from '@src/util';
 import {
   createRelationship,
   findSimilarRelationships,
@@ -92,7 +97,12 @@ export default function AddRelationshipForm() {
   }, [entity1?.id, entity2?.id, categoryId]);
 
   async function setPageInfo() {
-    const { url, title } = await getPageInfo();
+    let url, title;
+
+    try {
+      ({ url, title } = await getPageInfo());
+    } catch (error) {}
+
     setUrl(url || '');
     setTitle(title || '');
   }
@@ -274,13 +284,18 @@ export default function AddRelationshipForm() {
   }
 
   const showDescriptionInputs = ['4', '6', '8', '9', '12'].includes(categoryId);
-  console.log('entity1 query', entity1Query);
+  const queueNum = countQueueItems(queue);
 
   return (
     <div className='w-full'>
-      <div className='p-2'>
-        <div className='flex space-x-2'>
-          <div className='flex-1'>
+      <div className='w-full p-2'>
+        <div className='flex w-full space-x-2'>
+          <div
+            className='flex-1'
+            style={{
+              maxWidth: entity1 && entity2 ? 'calc(100% - 3rem)' : '100%',
+            }}
+          >
             <EntityPicker
               placeholder='entity 1'
               entity={entity1}
@@ -295,8 +310,8 @@ export default function AddRelationshipForm() {
               setEntity={setEntity2}
             />
           </div>
-          <div className='my-auto flex-none'>
-            {entity1 && entity2 && (
+          {entity1 && entity2 && (
+            <div className='my-auto w-8 flex-none'>
               <button
                 className='btn btn-circle btn-outline input-bordered btn-sm'
                 onClick={swapEntities}
@@ -315,8 +330,8 @@ export default function AddRelationshipForm() {
                   />
                 </svg>
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         <RelationshipPicker
@@ -460,16 +475,16 @@ export default function AddRelationshipForm() {
           </button>
           <button
             className='text-md btn btn-accent flex-none'
-            onClick={applyQueueItem}
-          >
-            Next
-          </button>
-
-          <button
-            className='text-md btn btn-accent flex-none'
             onClick={openQueue}
           >
-            Queue
+            Queue ({queueNum})
+          </button>
+          <button
+            className='text-md btn btn-accent flex-none'
+            onClick={applyQueueItem}
+            disabled={queueNum < 1}
+          >
+            Next
           </button>
         </div>
       </div>

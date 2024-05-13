@@ -15,10 +15,8 @@ export default function EntityPicker({
   entityQuery,
   setEntity,
 }: Props) {
-  console.log(placeholder, 'picker query', entityQuery);
-
   return (
-    <div className='mt-2'>
+    <div className='mt-2 w-full'>
       {entity && (
         <SelectedEntity entity={entity} onRemove={() => setEntity(null)} />
       )}

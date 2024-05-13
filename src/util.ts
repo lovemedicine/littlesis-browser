@@ -19,13 +19,17 @@ export async function getPageInfo(): Promise<{
   title: string;
 }> {
   return new Promise((resolve, reject) => {
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      chrome.tabs.sendMessage(
-        tabs[0].id as number,
-        { message: 'getPageInfo' },
-        resolve
-      );
-    });
+    try {
+      chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        chrome.tabs.sendMessage(
+          tabs[0].id as number,
+          { message: 'getPageInfo' },
+          resolve
+        );
+      });
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -60,4 +64,11 @@ export function nextQueueItem(queue: string): [string, QueueItem | null] {
   );
   const newQueue = [queueLines[0], ...queueLines.slice(lineNum + 1)].join('\n');
   return [newQueue, item];
+}
+
+export function countQueueItems(queue: string): number {
+  return Math.max(
+    0,
+    queue.split(/\n+/).filter(line => line.length > 0).length - 1
+  );
 }
