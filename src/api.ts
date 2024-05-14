@@ -148,7 +148,7 @@ type EssentialRelationshipData = {
 export async function findSimilarRelationships(
   token: string,
   data: EssentialRelationshipData
-): Promise<{ url: string }[] | null> {
+): Promise<{ url: string }[]> {
   const params = new URLSearchParams(data).toString();
   const url = baseUrl + '/relationships/find_similar?' + params;
   const response = await fetch(url, {
@@ -160,7 +160,7 @@ export async function findSimilarRelationships(
     },
   });
 
-  if (!response.ok) return null;
+  if (!response.ok) return [];
   return await response.json();
 }
 

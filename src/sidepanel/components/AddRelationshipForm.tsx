@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'preact/hooks';
+import { ArrowsUpDownMiniSolid, ArrowPathMiniSolid } from 'preact-heroicons';
 import EntityPicker from './EntityPicker';
 import RelationshipPicker from './RelationshipPicker';
 import TextInput from './TextInput';
@@ -76,36 +77,34 @@ export default function AddRelationshipForm() {
 
   useEffect(() => {
     validateData();
-  }, [entity1, entity2, categoryId, isCurrent, startDate, endDate, url, title]);
+  }, [
+    entity1?.id,
+    entity2?.id,
+    categoryId,
+    isCurrent,
+    startDate,
+    endDate,
+    url,
+    title,
+  ]);
 
   useEffect(() => {
     async function checkSimilarRelationships() {
-      let data;
-
       if (entity1?.id && entity2?.id && categoryId) {
-        data = await findSimilarRelationships(token, {
+        const data = await findSimilarRelationships(token, {
           entity1_id: entity1.id.toString(),
           entity2_id: entity2.id.toString(),
           category_id: categoryId.toString(),
         });
-      }
 
-      setSimilarRelationshipUrls((data || []).map(rel => rel.url));
+        setSimilarRelationshipUrls(data.map(rel => rel.url));
+      } else {
+        setSimilarRelationshipUrls([]);
+      }
     }
 
     checkSimilarRelationships();
   }, [entity1?.id, entity2?.id, categoryId]);
-
-  async function setPageInfo() {
-    let url, title;
-
-    try {
-      ({ url, title } = await getPageInfo());
-    } catch (error) {}
-
-    setUrl(url || '');
-    setTitle(title || '');
-  }
 
   function validateData() {
     let errors: ValidationErrors = {};
@@ -165,12 +164,6 @@ export default function AddRelationshipForm() {
     applyQueueItem();
   }
 
-  function swapEntities() {
-    const entity1Copy = entity1;
-    setEntity1(entity2);
-    setEntity2(entity1Copy);
-  }
-
   useEffect(() => {
     saveData();
   }, [
@@ -186,6 +179,23 @@ export default function AddRelationshipForm() {
     similarRelationshipUrls.join(','),
     queue,
   ]);
+
+  async function setPageInfo() {
+    let url, title;
+
+    try {
+      ({ url, title } = await getPageInfo());
+    } catch (error) {}
+
+    setUrl(url || '');
+    setTitle(title || '');
+  }
+
+  function swapEntities() {
+    const entity1Copy = entity1;
+    setEntity1(entity2);
+    setEntity2(entity1Copy);
+  }
 
   function saveData() {
     const data = {
@@ -313,22 +323,11 @@ export default function AddRelationshipForm() {
           {entity1 && entity2 && (
             <div className='my-auto w-8 flex-none'>
               <button
-                className='btn btn-circle btn-outline input-bordered btn-sm'
+                className='btn-outline btn input-bordered btn-sm btn-circle'
                 onClick={swapEntities}
                 title='swap entities'
               >
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  viewBox='0 0 20 20'
-                  fill='currentColor'
-                  className='h-5 w-5'
-                >
-                  <path
-                    fillRule='evenodd'
-                    d='M2.24 6.8a.75.75 0 0 0 1.06-.04l1.95-2.1v8.59a.75.75 0 0 0 1.5 0V4.66l1.95 2.1a.75.75 0 1 0 1.1-1.02l-3.25-3.5a.75.75 0 0 0-1.1 0L2.2 5.74a.75.75 0 0 0 .04 1.06Zm8 6.4a.75.75 0 0 0-.04 1.06l3.25 3.5a.75.75 0 0 0 1.1 0l3.25-3.5a.75.75 0 1 0-1.1-1.02l-1.95 2.1V6.75a.75.75 0 0 0-1.5 0v8.59l-1.95-2.1a.75.75 0 0 0-1.06-.04Z'
-                    clipRule='evenodd'
-                  />
-                </svg>
+                <ArrowsUpDownMiniSolid className='h-5 w-5' />
               </button>
             </div>
           )}
@@ -396,22 +395,11 @@ export default function AddRelationshipForm() {
           </div>
           <div className='my-auto flex-none'>
             <button
-              className='btn btn-circle btn-outline input-bordered btn-sm'
+              className='btn-outline btn input-bordered btn-sm btn-circle'
               onClick={setPageInfo}
               title='update page url and title'
             >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                viewBox='0 0 20 20'
-                fill='currentColor'
-                className='h-5 w-5'
-              >
-                <path
-                  fillRule='evenodd'
-                  d='M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z'
-                  clipRule='evenodd'
-                />
-              </svg>
+              <ArrowPathMiniSolid className='h-5 w-5' />
             </button>
           </div>
         </div>
@@ -458,7 +446,7 @@ export default function AddRelationshipForm() {
 
         <div className='mt-2 flex space-x-2'>
           <button
-            className='text-md btn btn-primary flex-1'
+            className='text-md btn-primary btn flex-1'
             onClick={handleSubmit}
             disabled={isSaving}
           >
@@ -468,19 +456,19 @@ export default function AddRelationshipForm() {
             )}
           </button>
           <button
-            className='text-md btn btn-secondary flex-none'
+            className='text-md btn-secondary btn flex-none'
             onClick={handleReset}
           >
             Reset
           </button>
           <button
-            className='text-md btn btn-accent flex-none'
+            className='text-md btn-accent btn flex-none'
             onClick={openQueue}
           >
             Queue ({queueNum})
           </button>
           <button
-            className='text-md btn btn-accent flex-none'
+            className='text-md btn-accent btn flex-none'
             onClick={applyQueueItem}
             disabled={queueNum < 1}
           >

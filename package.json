@@ -15,7 +15,7 @@
     "format": "prettier src/ scripts/ --write"
   },
   "type": "module",
-  "packageManager": "pnpm@9.0.6",
+  "packageManager": "pnpm@9.1.1",
   "devDependencies": {
     "@babel/core": "^7.21.0",
     "@babel/plugin-proposal-class-properties": "^7.18.6",
@@ -91,6 +91,7 @@
   "dependencies": {
     "@github/mini-throttle": "^2.1.1",
     "daisyui": "^4.10.2",
-    "hotkeys-js": "^3.13.7"
+    "hotkeys-js": "^3.13.7",
+    "preact-heroicons": "^2.1.3"
   }
 }
